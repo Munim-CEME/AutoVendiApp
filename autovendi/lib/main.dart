@@ -1,4 +1,5 @@
 import 'package:autovendi/firebase_options.dart';
+import 'package:autovendi/locations_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -9,7 +10,19 @@ Future main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(LoginScreen());
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: LoginScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
 }
 
 class LoginScreen extends StatelessWidget {
@@ -26,11 +39,10 @@ class LoginScreen extends StatelessWidget {
             Opacity(
               opacity: 0.5,
               child: Image.asset(
-                'assets/isoview.png', // Replace with your image asset
+                'assets/isoview.png',
                 fit: BoxFit.cover,
                 height: double.infinity,
                 width: double.infinity,
-                // color: const Color.fromARGB(255, 255, 255, 255),
               ),
             ),
             Center(
@@ -64,13 +76,21 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(
                     width: 300, // Set the desired width
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        signUpUser(
+                      onPressed: () async {
+                        String? result = await signInUser(
                             emailController.text, passwordController.text);
+                        if (result == null) {
+                          // ignore: use_build_context_synchronously
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LocationView()),
+                          );
+                        }
                       },
                       icon: const Icon(Icons.email),
                       label: const Text(
-                        'Sign up with Email',
+                        'Sign in with Email',
                         style: TextStyle(color: Colors.black),
                       ),
                       style: ElevatedButton.styleFrom(
@@ -119,10 +139,18 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(
                     width: 150, // Set the desired width
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         // Handle email sign-in
-                        signUpUser(
+                        String? result = await loginUser(
                             emailController.text, passwordController.text);
+                        if (result == null) {
+                          // ignore: use_build_context_synchronously
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LocationView()),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: customGray, // Use custom gray color
@@ -143,11 +171,11 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Future<String?> signUpUser(String email, String password) async {
+  Future<String?> signInUser(String email, String password) async {
     try {
       FirebaseAuth auth = FirebaseAuth.instance;
       await auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+          email: email.trim(), password: password.trim());
       return null;
     } catch (e) {
       if (kDebugMode) {
@@ -160,7 +188,8 @@ class LoginScreen extends StatelessWidget {
   Future<String?> loginUser(String email, String password) async {
     try {
       FirebaseAuth auth = FirebaseAuth.instance;
-      await auth.signInWithEmailAndPassword(email: email, password: password);
+      await auth.signInWithEmailAndPassword(
+          email: email.trim(), password: password.trim());
       return null;
     } catch (e) {
       if (kDebugMode) {
