@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "631488551474",
+    "firebase_url": "https://autovendi-5d754-default-rtdb.firebaseio.com",
+    "project_id": "autovendi-5d754",
+    "storage_bucket": "autovendi-5d754.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:631488551474:android:cd55078bc34e9f74443a2b",
+        "android_client_info": {
+          "package_name": "com.example.autovendi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhjaJ5EWeZrSkUNSkYDwobkhi3t2J5gjs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
