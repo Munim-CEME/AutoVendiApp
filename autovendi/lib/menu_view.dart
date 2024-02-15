@@ -13,21 +13,17 @@ class MenuView extends StatefulWidget {
 }
 
 class _MenuViewState extends State<MenuView> {
-  MenuViewModel _menuViewModel = MenuViewModel();
-
+  final MenuViewModel _menuViewModel = MenuViewModel();
 
   @override
   void initState() {
     _menuViewModel.start();
-super.initState();
+    super.initState();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<ProductProvider>(context);
-
 
     return Stack(
       children: [
@@ -59,10 +55,12 @@ super.initState();
               stream: _menuViewModel.outputWishlistStream,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return _getProduct(snapshot.data!.products, context, productProvider);
+                  return _getProduct(
+                      snapshot.data!.products, context, productProvider);
                 } else {
                   return const Center(
-                    child: Center(child: CircularProgressIndicator(
+                    child: Center(
+                        child: CircularProgressIndicator(
                       color: Colors.grey,
                     )),
                   );
@@ -75,7 +73,6 @@ super.initState();
     );
   }
 }
-
 
 Widget _getProduct(List<Product> products, BuildContext context,
     ProductProvider productProvider) {
@@ -132,12 +129,19 @@ Widget _getProduct(List<Product> products, BuildContext context,
                       Expanded(
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            products[index].imageUrl,
-                            fit: BoxFit.cover,
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height,
-                          ),
+                          child: Image.network(products[index].imageUrl,
+                              fit: BoxFit.cover,
+                              width: MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.height,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) =>
+                                      loadingProgress == null
+                                          ? child
+                                          : const Center(
+                                              child: CircularProgressIndicator(
+                                                color: Colors.grey,
+                                              ),
+                                            )),
                         ),
                       ),
                       const SizedBox(
