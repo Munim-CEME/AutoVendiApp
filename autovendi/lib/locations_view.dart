@@ -1,3 +1,4 @@
+import 'package:autovendi/menu_view.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
@@ -13,8 +14,19 @@ class _LocationViewState extends State<LocationView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
-        title: Text(location),
+        title: const Center(
+          child: Text(
+            'Select Your Area',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        backgroundColor: Colors.grey,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -44,9 +56,16 @@ class _LocationViewState extends State<LocationView> {
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: InkWell(
                             onTap: () {
+
                               setState(() {
                                 location = block;
                               });
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const MenuView()),
+                              );
                             },
                             child: Container(
                               decoration: BoxDecoration(
