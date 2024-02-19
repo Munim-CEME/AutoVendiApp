@@ -1,16 +1,24 @@
 import 'package:autovendi/firebase_options.dart';
 import 'package:autovendi/locations_view.dart';
+import 'package:autovendi/menu_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+
+import 'bloc/Add_To_Wishlist_Bloc/AddToWishlist_bloc.dart';
+import 'menu_view_model.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => ProductProvider(),
+      child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -18,9 +26,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: LoginScreen(),
-      debugShowCheckedModeBanner: false,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+            create: (context) =>
+            AddToWishlistBloc()..add(const LoadAddToWishlistIcon())),
+
+      ],
+      child: MaterialApp(
+        home: LoginScreen(),
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }
