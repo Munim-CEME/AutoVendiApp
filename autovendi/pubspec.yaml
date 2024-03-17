@@ -42,6 +42,10 @@ dependencies:
   equatable: ^2.0.5
   provider: ^6.1.1
   cloud_firestore: ^4.14.0
+  animated_snack_bar: ^0.4.0
+  top_snackbar_flutter: ^3.1.0
+  flutter_slidable: ^3.0.1
+  roslibdart: ^0.0.1-dev+4
 
 dev_dependencies:
   flutter_test:

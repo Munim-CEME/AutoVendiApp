@@ -2,24 +2,26 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 class Product {
   final String name;
   final String description;
   final String imageUrl;
-  final int price;
+  final String compartment;
+  int price;
   int quantity = 1;
-
-  Product(
-      this.name, this.description, this.imageUrl, this.price, this.quantity);
+  Product(this.name, this.description, this.imageUrl, this.price, this.quantity,
+      this.compartment);
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       json['name'],
       json['description'],
       json['imageUrl'],
-      json['price'],
-      json['quantity'],
+      int.parse(json['price']),
+      (json['quantity']),
+      json['compartment'],
     );
   }
 
@@ -29,15 +31,17 @@ class Product {
         'imageUrl': imageUrl,
         'price': price,
         'quantity': quantity,
+        'compartment': compartment,
       };
 
   factory Product.fromSnapshot(Map<String, dynamic> snap) {
     return Product(
-      snap['name'],
-      snap['description'],
-      snap['imageUrl'],
-      snap['price'],
-      snap['quantity'],
+      snap['name'] ?? '',
+      snap['description'] ?? '',
+      snap['imageUrl'] ?? '',
+      snap['price'] ?? 0,
+      snap['quantity'] ?? 0,
+      snap['compartment'] ?? "",
     );
   }
 
@@ -48,6 +52,7 @@ class Product {
       'imageUrl': imageUrl,
       'price': price,
       'quantity': quantity,
+      'compartment': compartment,
     };
   }
 }
@@ -72,7 +77,7 @@ class Wishlist extends Equatable {
 
   Map<String, dynamic> toDocument() {
     return {
-      'wishlist': products.map(
+      'products': products.map(
         (product) {
           return product.toDocument();
         },
@@ -86,16 +91,36 @@ class Wishlist extends Equatable {
 
   factory Wishlist.fromSnapshot(DocumentSnapshot snap) {
     return Wishlist(
-        products: (snap['products'] as List).map((product) {
-      print(
+        products: (snap['products']['products'] as List).map((product) {
+      debugPrint(
           "=========================================================================");
-      print("Product from snapshot: $product");
-      print(
+      debugPrint("Product from snapshot: $product");
+      debugPrint(
           "=========================================================================");
       return Product.fromSnapshot(product);
     }).toList()
         // snap['wishlist'] returns the map from the firebase, the map has 'wishlist' key and a list as value, so to access
         // the value, which is a list, we use ['wishlist']
         );
+  }
+}
+
+class LocationAxis {
+  double x = 0;
+  double y = 0;
+  double z = 0;
+  LocationAxis({required this.x, required this.y, required this.z});
+  LocationAxis.fromJson(List<Object?> json) {
+    x = json[0] as double;
+    y = json[1] as double;
+    z = json[2] as double;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['x'] = x;
+    data['y'] = y;
+    data['z'] = z;
+    return data;
   }
 }
