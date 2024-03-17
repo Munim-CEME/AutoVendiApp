@@ -1,3 +1,4 @@
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:autovendi/product_view_model.dart';
 import 'package:autovendi/resources/color_manager.dart';
 import 'package:autovendi/resources/strings_manager.dart';
@@ -51,14 +52,8 @@ class _ProductViewState extends State<ProductView> {
       body: Stack(
         children: [
           Container(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
-            height: MediaQuery
-                .of(context)
-                .size
-                .height * 0.65,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height * 0.65,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                   begin: Alignment.topCenter,
@@ -73,56 +68,31 @@ class _ProductViewState extends State<ProductView> {
             ),
             // TODO: Set the image
           ),
-          Container(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
-            height: MediaQuery
-                .of(context)
-                .size
-                .height * 0.4,
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height * 0.4,
             child: Image.network(
               productProvider.product.imageUrl,
               // TODO: Check the width and the height of the images that will be added
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
-              height: MediaQuery
-                  .of(context)
-                  .size
-                  .height * 0.4,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.4,
             ),
           ),
           SingleChildScrollView(
-            physics:
-            const ClampingScrollPhysics(),
+            physics: const ClampingScrollPhysics(),
             // TODO: Change the scroll physics to bounce with imageSize incr and dec with scroll
             child: Column(
               children: [
                 SizedBox(
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width,
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height * 0.3,
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.3,
                 ),
                 Container(
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width,
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height * 0.8,
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.8,
                   decoration: const BoxDecoration(
                     color: Colors.white,
-                    borderRadius:  BorderRadius.only(
+                    borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(30),
                         topRight: Radius.circular(30)),
                   ),
@@ -170,24 +140,12 @@ class _ProductViewState extends State<ProductView> {
           ),
           Positioned(
             bottom: 10,
-            left: MediaQuery
-                .of(context)
-                .size
-                .width * 0.05,
-            right: MediaQuery
-                .of(context)
-                .size
-                .width * 0.05,
+            left: MediaQuery.of(context).size.width * 0.05,
+            right: MediaQuery.of(context).size.width * 0.05,
             child: SafeArea(
               child: Container(
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width * 0.9,
-                height: MediaQuery
-                    .of(context)
-                    .size
-                    .height * 0.08,
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery.of(context).size.height * 0.08,
                 decoration: BoxDecoration(
                     color: Colors.grey,
                     borderRadius: BorderRadius.circular(12)),
@@ -196,8 +154,9 @@ class _ProductViewState extends State<ProductView> {
                     CounterButton(
                         iconData: Icons.remove,
                         onPressed: () {
-                          _productViewModel.decrement();
-                          _productViewModel.priceMultiplier();
+                          _productViewModel.decrement(productProvider.product);
+                          _productViewModel
+                              .priceMultiplier(productProvider.product);
                         }),
                     StreamBuilder<int>(
                       stream: _productViewModel.outputCounterStream,
@@ -214,8 +173,9 @@ class _ProductViewState extends State<ProductView> {
                     CounterButton(
                         iconData: Icons.add,
                         onPressed: () {
-                          _productViewModel.increment();
-                          _productViewModel.priceMultiplier();
+                          _productViewModel.increment(productProvider.product);
+                          _productViewModel
+                              .priceMultiplier(productProvider.product);
                         }),
                     Expanded(
                       child: Padding(
@@ -259,8 +219,21 @@ class _ProductViewState extends State<ProductView> {
                                       horizontal: AppPadding.padding8,
                                       vertical: AppPadding.padding4),
                                   child: GestureDetector(
-                                    onTap: () {
-                                      _productViewModel.addToWishlist(productProvider.product);
+                                    onTap: () async {
+                                      bool checker =
+                                          await _productViewModel.addToWishlist(
+                                              productProvider.product);
+
+                                      if (checker) {
+                                        debugPrint("Added to Wishlist");
+                                        _showSnackBar(
+                                            context, "Added to Wishlist");
+                                      } else {
+                                        debugPrint("Already in Wishlist");
+
+                                        _showSnackBar(
+                                            context, "Already in Wishlist");
+                                      }
                                     },
                                     child: BlocBuilder<AddToWishlistBloc,
                                         AddToWishlistState>(
@@ -303,5 +276,31 @@ class _ProductViewState extends State<ProductView> {
     );
   }
 
-
+  _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        content: Center(
+          child: Text(
+            message,
+            style: TextStyle(
+              color: ColorManager.white,
+              fontSize: AppSize.size18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).size.height - 100,
+            right: 20,
+            left: 20),
+        duration: const Duration(seconds: 2),
+        dismissDirection: DismissDirection.down,
+        backgroundColor: ColorManager.grey2,
+      ),
+    );
+  }
 }

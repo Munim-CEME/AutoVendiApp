@@ -1,7 +1,8 @@
-import 'package:autovendi/domain/model/location.dart';
 import 'package:autovendi/menu_view.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+
+import 'domain/model/model.dart';
 
 class LocationView extends StatefulWidget {
   const LocationView({super.key});
@@ -11,7 +12,6 @@ class LocationView extends StatefulWidget {
 }
 
 class _LocationViewState extends State<LocationView> {
-  LocationAxis locationAxis = LocationAxis(x: 0, y: 0, z: 0);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,3 +91,5 @@ class _LocationViewState extends State<LocationView> {
     );
   }
 }
+
+LocationAxis locationAxis = LocationAxis(x: 0, y: 0, z: 0);

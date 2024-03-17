@@ -12,8 +12,8 @@ class ProductViewModel {
   int counter = 1;
   late int price; // TODO: Change the type back to int
 
-  FirebaseAuth _auth = FirebaseAuth.instance;
-  FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   void start() {
     inputCounterStream.add(counter);
@@ -25,8 +25,8 @@ class ProductViewModel {
     _priceStreamController.close();
   }
 
-  addToWishlist(Product product) async {
-   /* await _firebaseFirestore.collection("products").doc("cart").update({
+  Future<bool> addToWishlist(Product product) async {
+    /* await _firebaseFirestore.collection("products").doc("cart").update({
       'products': {
         'name': product.name,
         'description': product.description,
@@ -36,17 +36,20 @@ class ProductViewModel {
       }
     });*/
 
-    DocumentSnapshot snapshot = await _firebaseFirestore
-        .collection("products")
-        .doc("cart")
-        .get();
+    DocumentSnapshot snapshot =
+        await _firebaseFirestore.collection("products").doc("cart").get();
 
-    print("=====================================");
-    print(snapshot.data);
-    print(Wishlist.fromSnapshot(snapshot));
-    print("=====================================");
+    print("==============PVM==============");
+    print(snapshot['products']);
+    print("============PVM===================");
 
     Wishlist wishlist = Wishlist.fromSnapshot(snapshot);
+
+    for (int i = 0; i < wishlist.products.length; i++) {
+      if (wishlist.products[i].name == product.name) {
+        return false;
+      }
+    }
 
     print("========== Wishlist(fromSnapshot)'s output in Rep Imp ==========");
 
@@ -60,21 +63,81 @@ class ProductViewModel {
         .collection("products")
         .doc("cart")
         .update({'products': wishlist.toDocument()});
+
+    return true;
   }
 
-  decrement() {
+  decrement(Product product) {
     if (counter <= 0) {
       counter = 1;
     } else {
       counter--;
     }
 
+    changeQuantity(counter, product);
     inputCounterStream.add(counter);
   }
 
-  increment() {
+  changeQuantity(int val, Product product) async {
+    DocumentSnapshot snapshot =
+        await _firebaseFirestore.collection("products").doc("cart").get();
+
+    print("==============Change Quantity==============");
+    print(snapshot['products']);
+    print("============Change Quantity===================");
+
+    Wishlist wishlist = Wishlist.fromSnapshot(snapshot);
+
+    for (int i = 0; i < wishlist.products.length; i++) {
+      if (wishlist.products[i].name == product.name) {
+        wishlist.products[i].quantity = val;
+        print("==========Updated Quantity===========");
+        print(wishlist.products[i].quantity);
+        print("==========Updated Quantity===========");
+      }
+    }
+
+    print("======== Updated Wishlist (Price) ======");
+    // print(updatedWishlist);
+    print(wishlist);
+
+    await _firebaseFirestore
+        .collection("products")
+        .doc("cart")
+        .update({'products': wishlist.toDocument()});
+  }
+
+  increment(Product product) {
     counter++;
+
+    changeQuantity(counter, product);
     inputCounterStream.add(counter);
+  }
+
+  changePrice(int price, Product product) async {
+    DocumentSnapshot snapshot =
+        await _firebaseFirestore.collection("products").doc("cart").get();
+
+    print("==============Change Price==============");
+    print(snapshot['products']);
+    print("============Change Price===================");
+
+    Wishlist wishlist = Wishlist.fromSnapshot(snapshot);
+
+    for (int i = 0; i < wishlist.products.length; i++) {
+      if (wishlist.products[i].name == product.name) {
+        wishlist.products[i].price = price;
+      }
+    }
+
+    print("======== Updated Wishlist (Price)======");
+    // print(updatedWishlist);
+    print(wishlist);
+
+    await _firebaseFirestore
+        .collection("products")
+        .doc("cart")
+        .update({'products': wishlist.toDocument()});
   }
 
   Sink get inputCounterStream => _counterStreamController.sink;
@@ -82,12 +145,15 @@ class ProductViewModel {
   Stream<int> get outputCounterStream =>
       _counterStreamController.stream.map((value) => _ifZeroOrLess(value));
 
-  priceMultiplier() {
+  priceMultiplier(Product product) {
     final newPrice = price * counter;
 
     if (counter > 0) {
+      changePrice(newPrice, product);
       inputPriceStream.add(newPrice);
     } else {
+      changePrice(price, product);
+
       inputPriceStream.add(price);
     }
   }

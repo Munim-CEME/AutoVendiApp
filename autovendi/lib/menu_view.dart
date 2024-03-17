@@ -1,4 +1,7 @@
+import 'package:autovendi/cart_view.dart';
 import 'package:autovendi/product_view.dart';
+import 'package:autovendi/resources/color_manager.dart';
+import 'package:autovendi/resources/values_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +16,7 @@ class MenuView extends StatefulWidget {
 }
 
 class _MenuViewState extends State<MenuView> {
-  final MenuViewModel _menuViewModel = MenuViewModel();
+  MenuViewModel _menuViewModel = MenuViewModel();
 
   @override
   void initState() {
@@ -38,17 +41,33 @@ class _MenuViewState extends State<MenuView> {
         ),
         Scaffold(
           appBar: AppBar(
-            title: const Center(
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
+            title: Text(
+              'Menu',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
               ),
             ),
             backgroundColor: Colors.grey,
+            actions: [
+              Padding(
+                  padding: const EdgeInsets.only(right: AppPadding.padding12),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CartView()),
+                      );
+                    },
+                    child: Icon(
+                      Icons.shopping_cart_outlined,
+                      color: ColorManager.white,
+                      size: AppSize.size25,
+                    ),
+                  ))
+            ],
           ),
           body: SingleChildScrollView(
             child: StreamBuilder<Wishlist>(
@@ -129,19 +148,12 @@ Widget _getProduct(List<Product> products, BuildContext context,
                       Expanded(
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: Image.network(products[index].imageUrl,
-                              fit: BoxFit.cover,
-                              width: MediaQuery.of(context).size.width,
-                              height: MediaQuery.of(context).size.height,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) =>
-                                      loadingProgress == null
-                                          ? child
-                                          : const Center(
-                                              child: CircularProgressIndicator(
-                                                color: Colors.grey,
-                                              ),
-                                            )),
+                          child: Image.network(
+                            products[index].imageUrl,
+                            fit: BoxFit.cover,
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height,
+                          ),
                         ),
                       ),
                       const SizedBox(
@@ -149,6 +161,8 @@ Widget _getProduct(List<Product> products, BuildContext context,
                       ),
                       Text(
                         products[index].name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.black,
                           fontSize: 14,

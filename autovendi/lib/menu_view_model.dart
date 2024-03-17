@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'domain/model/model.dart';
 
 class MenuViewModel {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   final StreamController _wishlistStreamController =
       StreamController<Wishlist>.broadcast();
@@ -21,7 +23,7 @@ class MenuViewModel {
         await _firebaseFirestore.collection("products").doc("products").get();
 
     print("=====================================");
-    print(snapshot.data);
+    print(snapshot['products']);
     print(Wishlist.fromSnapshot(snapshot));
     print("=====================================");
 
